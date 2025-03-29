@@ -2,7 +2,7 @@
 
 
 
-template<typename F> //requires std::floating_point<F>
+template<typename F> requires std::floating_point<F>
 class complex_number
 {
     F Re;
@@ -38,10 +38,10 @@ il const serve a esplicitare il fatto che non modifico l'istanza sulla quale lo 
 	
 	
 	complex_number& operator+=(const complex_number& other) {
-		Re += other.Re;
+		Re += other.Re; // con attributo
         Im += other.Im;
 		
-        //Re += other.num_Re();
+        //Re += other.num_Re(); // con metodo
         //Im += other.num_Im();
         return *this;
 	}
@@ -70,26 +70,60 @@ il const serve a esplicitare il fatto che non modifico l'istanza sulla quale lo 
         ret += other;
         return ret;
     }
+	// moltiplicazione
+	complex_number& operator*=(const complex_number& other) {
+		F a = Re;
+		F b = Im;
+		Re = a*other.Re - b*other.Im; //con attributo
+        Im = a*other.Im + b*other.Re;
+        return *this;
+	}
+	
+	complex_number operator*(const complex_number& other) const {
+        complex_number ret = *this;
+        ret *= other;
+        return ret;
+    }
+	
+	
+	complex_number& operator*=(const F& other) {
+        Re *= other;
+		Im *= other;
+        return *this;
+	}
+	
+	complex_number operator*(const F& other) const {
+        complex_number ret = *this;
+        ret *= other;
+        return ret;
+    }
 	
 };
 
-template<typename F>
+template<typename F> //requires std::floating_point<F>
 complex_number<F> operator+(const F& d, const complex_number<F>& com){
     return com + d;
 }
 
+
+//commutatività moltiplicazione
+template<typename F> //requires std::floating_point<F>
+complex_number<F> operator*(const F& d, const complex_number<F>& com){
+    return com * d;
+}
+
+
 /*
 A questa funzione passo per riferimento costante ...
 */
-template<typename F>
+template<typename F> //requires std::floating_point<F>
 complex_number<F> conjugate(const complex_number<F>& r) {
     return complex_number<F>(r.num_Re(), -r.num_Im());
 }
 
 
-template<typename F>
-std::ostream&
-operator<<(std::ostream& os, const complex_number<F>& r) {
+template<typename F> //requires std::floating_point<F>
+std::ostream& operator<<(std::ostream& os, const complex_number<F>& r) {
     if (r.num_Im() != 0){
 		if (r.num_Im()<0){
 			
